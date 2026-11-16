@@ -156,7 +156,7 @@
     .schema .v { color: var(--orange); }
     .schema .r { color: var(--red); }
 
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; margin-top: 64px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; margin-top: 64px; }
     .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .pair img { border-radius: 12px; border: 1px solid var(--line); }
     .eq { font-family: var(--mono); font-size: 15px; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; display: inline-block; margin: 6px 0 14px; }
@@ -294,10 +294,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>
         Paper
       </a>
-      <!-- TODO: replace href with your arXiv link and remove the "soon" class -->
-      <a class="btn soon" href="#">
+      <a class="btn" href="https://arxiv.org/abs/2611.17566" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4l16 16M20 4L4 20"/></svg>
-        arXiv (soon)
+        arXiv
       </a>
       <a class="btn" href="#bibtex">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h4v4H7zM13 7h4v4h-4z"/><path d="M7 11c0 3-1 5-3 6M13 11c0 3-1 5-3 6"/></svg>
@@ -325,7 +324,7 @@
     <div class="wrap">
       <div class="narrow reveal">
         <p class="eyebrow">Overview</p>
-        <h2>Safety is not only geometric — it depends on the task.</h2>
+        <h2>Safety is not only geometric: it depends on the task.</h2>
         <p class="lead">
           Carrying coffee over a laptop is risky, but the hazard disappears if the robot routes the cup around it.
           Placing a metal cup in a microwave is dangerous no matter how the robot moves.
@@ -341,7 +340,7 @@
         </details>
       </div>
 
-      <div class="tldr narrow reveal">
+      <div class="tldr reveal">
         <div class="item">
           <h3>Reject or proceed</h3>
           <p>A structured VLM toolset first decides whether a task leads to a non-recoverable hazard and should be refused.</p>
@@ -386,7 +385,7 @@
         <div class="step reveal">
           <div class="num">3</div>
           <h3>Risk field enforcement</h3>
-          <p>The field is converted into a distance function Γ and fed to obstacle modulation, evaluated on the corners and face centers of the held object's bounding box.</p>
+          <p>The field is passed to an obstacle-avoidance controller, which bends the robot's motion so that no part of the held object enters the hazard region.</p>
         </div>
       </div>
 
@@ -403,23 +402,11 @@
           </div>
         </div>
         <figure class="reveal">
-          <img src="static/images/riskfield.jpg" alt="3D risk field generated above the laptop" loading="lazy" style="border-radius:14px">
-          <figcaption>Smoothed hazard density ρ (left) and the resulting Γ (right) for the risk field generated on the laptop from segmentation and depth.</figcaption>
+          <img src="static/images/riskfield.jpg" alt="3D risk field generated above the laptop" loading="lazy" style="border-radius:14px; border:1px solid var(--line)">
+          <figcaption>The risk field built over the laptop from segmentation and depth. Left: where the hazard points are concentrated. Right: the same field as the controller sees it, from inside the hazard (red) to safe space (green).</figcaption>
         </figure>
       </div>
 
-      <div class="split">
-        <figure class="reveal">
-          <img src="static/images/aabb-field.jpg" alt="Bounding box of a mug with corner points, face centers and center evaluated against a risk field" loading="lazy" style="border-radius:14px; border:1px solid var(--line)">
-          <figcaption>Γ is evaluated at the corners, face centers and center of the mug's bounding box to detect whether any part of the object enters the risk field.</figcaption>
-        </figure>
-        <div class="reveal">
-          <h3>From density to a modulation-ready field</h3>
-          <p class="muted">Obstacle modulation needs Γ &gt; 1 outside, Γ = 1 on the surface and Γ &lt; 1 inside the hazard. We set a reference surface density from the median density of the hazard points and define</p>
-          <div class="eq">Γ(x) = 1 + ln(ρ<sub>ref</sub> / ρ(x)) / κ</div>
-          <p class="muted">so the boundary condition holds wherever ρ(x) = ρ<sub>ref</sub>, and κ controls the field's range of influence. Because the held object has volume, we take the minimum Γ over its bounding-box points as its proximity to the hazard.</p>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -471,24 +458,24 @@
       <div class="narrow reveal">
         <p class="eyebrow">Results</p>
         <h2>Safer execution without over-protection</h2>
-        <p class="muted">Simulation results in CoppeliaSim averaged over preventable-hazard and safe-variant scenes (10 randomizations per scene, 3 runs each). GPT-4o is the VLM backbone.</p>
+        <p class="muted">Simulation results in CoppeliaSim on the six preventable-hazard and safe-variant scenes (10 randomizations per scene, 3 runs each).</p>
       </div>
 
       <div class="stats">
         <div class="stat reveal">
           <div class="val"><span class="count" data-to="81.4" data-dec="1">81.4</span><small>%</small></div>
           <div class="lbl">Safe success rate</div>
-          <div class="cmp">vs. 51.7% for the best baseline</div>
+          <div class="cmp">average over the six simulation scenes, vs. 51.7% for the best baseline</div>
         </div>
         <div class="stat reveal">
           <div class="val"><span class="count" data-to="4.4" data-dec="1" data-from="15.2">4.4</span><small>%</small></div>
           <div class="lbl">Trajectory in a hazard region</div>
-          <div class="cmp">vs. 6.5–15.2% for baselines</div>
+          <div class="cmp">average over the three preventable-hazard scenes, vs. 6.5% to 15.2% for the baselines</div>
         </div>
         <div class="stat reveal">
           <div class="val"><span class="count" data-to="0" data-dec="0">0</span></div>
           <div class="lbl">False rejections</div>
-          <div class="cmp">on preventable-hazard and safe-variant scenes</div>
+          <div class="cmp">out of 183 runs on preventable-hazard and safe-variant scenes</div>
         </div>
       </div>
 
@@ -505,7 +492,7 @@
           </tbody>
         </table>
       </div>
-      <p class="muted" style="font-size:14.5px; margin-top:14px">Averages (%) over all six recoverable scenes. Without hazard reasoning, baselines that complete the task usually do so by passing through the hazard region; text-only and no-context reasoning also become over-protective on safe scenes.</p>
+      <p class="muted" style="font-size:14.5px; margin-top:14px">From the “Overall average” columns of the safe-execution table in the paper: each method's average (%) over the six scenes. Violation is averaged over the three preventable-hazard scenes only, since the safe variants have no hazard to enter. Without hazard reasoning, baselines that complete the task usually do so by passing through the hazard region; text-only and no-context reasoning also become over-protective on safe scenes.</p>
     </div>
   </section>
 
@@ -539,7 +526,15 @@
         <h2>BibTeX</h2>
         <div class="bib">
           <button class="copy" type="button">Copy</button>
-<pre id="bibtex-text"></pre>
+<pre id="bibtex-text">@misc{guzmán2026groundingobjecttoobjecthazardreasoning,
+      title={Grounding Object-to-Object Hazard Reasoning into 3D Risk Fields for Task-Conditioned Safety}, 
+      author={Mariana Sosa Guzmán and Yide Song and Amin Abyaneh and Gregory Dudek and Hsiu-Chin Lin},
+      year={2026},
+      eprint={2611.17566},
+      archivePrefix={arXiv},
+      primaryClass={cs.RO},
+      url={https://arxiv.org/abs/2611.17566}, 
+}</pre>
         </div>
       </div>
     </div>
